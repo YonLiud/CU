@@ -146,18 +146,8 @@ def hough_lines(img,srcImg,rho, theta, threshold, min_line_len, max_line_gap):
 def getMidPoint(point1,point2):
     return ((point1[0]+point2[0])/2,(point1[1]+point1[1])/2)
 
-################################################################################################################################
-
-
-
-def main(cap):
-    while True:
-        #read image
-        _, img = cap.read()
-        if img is None:
-            break
-
-        #apply blur
+def getFinalData(img):
+            #apply blur
         blurImg = cv2.GaussianBlur(img,(11,11),0) #kernel size 11x11
         #canny edge detection
         edgesImage = cv2.Canny(blurImg,40,50)
@@ -167,7 +157,7 @@ def main(cap):
         vertices = [[3*imgWidth/4,3*imgHeight/5],[imgWidth/4,3*imgHeight/5],[40,imgHeight],[imgWidth-40,imgHeight]]
 
         roi = region_of_interest(edgesImage,vertices)
-        lineMarkedImage,lane = hough_lines(roi,img,1, np.pi/180, 40, 30, 200)
+        lineMarkedImage, lane = hough_lines(roi,img,1, np.pi/180, 40, 30, 200)
 
         if lane is not None:
             leftLane,rightLane = lane
@@ -182,14 +172,28 @@ def main(cap):
             lowerPoint = rightLane[2:4]
             p2 = seg_intersect(upperPoint,lowerPoint,referenceLine[0],referenceLine[1])
 
-            cv2.line(img,(int(p1[0]), int(p1[1])),(int(p2[0]), int(p2[1])),[0,0,255],12)
+            cv2.line(img,(int(p1[0]), int(p1[1])),(int(p2[0]), int(p2[1])),[255,255,255],12)
 
             p3,p4 = ((0,referenceLine[1][1]),(imgWidth,referenceLine[1][1]))
             carPoint = getMidPoint(p3,p4)
             lanePoint = getMidPoint(p1,p2)
-            cv2.circle(img,(int(lanePoint[0]), int(lanePoint[1])),10,(0,0,255),-1)
+            cv2.circle(img,(int(lanePoint[0]), int(lanePoint[1])),10,(255,255,255),-1)
             # cv2.circle(img,(int(carPoint[0]), int(carPoint[1])),15,(255,0,0),-1)
 
+            cv2.putText(img, "Lane",(int(lanePoint[0])-30, int(lanePoint[1])-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+        return img, lineMarkedImage, roi
+
+################################################################################################################################
+
+def main(cap):
+    while True:
+        #read image
+        _, img = cap.read()
+        if img is None:
+            break
+
+        img, lineMarkedImage, roi = getFinalData(img)
 
         img = cv2.resize(img, (1280, 720))
         lineMarkedImage = cv2.resize(lineMarkedImage,(640, 360))
@@ -202,6 +206,6 @@ def main(cap):
             break
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("video1.mp4")
+    cap = cv2.VideoCapture("video5.mp4")
     main(cap)
     cv2.destroyAllWindows()
