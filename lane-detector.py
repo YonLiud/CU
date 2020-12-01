@@ -1,6 +1,8 @@
 import numpy as np
 import cv2,math,sys
 
+from numpy.core.fromnumeric import shape
+
 
 # reset global state of average values
 avgLeft = (0, 0, 0, 0)
@@ -186,26 +188,32 @@ def getFinalData(img):
 
 ################################################################################################################################
 
-def main(cap):
-    while True:
+def lane_detector(cap):
         #read image
         _, img = cap.read()
-        if img is None:
-            break
 
         img, lineMarkedImage, roi = getFinalData(img)
-
-        img = cv2.resize(img, (1280, 720))
-        lineMarkedImage = cv2.resize(lineMarkedImage,(640, 360))
-        roi = cv2.resize(roi,(960, 450))
-        cv2.imshow('input',img)
         #cv2.imshow('roi',roi)
-        # cv2.waitKey(0)
-        cv2.imshow('hough lines',lineMarkedImage)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        return img, lineMarkedImage, roi
+
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("video5.mp4")
-    main(cap)
+    cap = cv2.VideoCapture(2)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+    while True:
+        img, lanes, roi = lane_detector(cap)
+
+        cv2.putText(img, str(img.shape[1])+"x"+str(img.shape[0]),(50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+        img = cv2.resize(img, (1280, 720))
+        lineMarkedImage = cv2.resize(lanes,(640, 360))
+        # roi = cv2.resize(roi,(960, 450))
+
+        cv2.imshow('img',img)
+        cv2.imshow('lanes', lanes)
+        #cv2.imshow('roi', roi)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
     cv2.destroyAllWindows()
