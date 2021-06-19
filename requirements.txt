@@ -3,3 +3,4 @@ opencv-python
 imutils
 pytesseract
 pandas
+python-dotenv

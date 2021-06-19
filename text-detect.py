@@ -6,7 +6,9 @@ import pytesseract
 import pandas as pd
 import time
 import asyncio
+from dotenv import dotenv_values
 
+config = dotenv_values(".env")
 car_cascade = cv2.CascadeClassifier('cars.xml') 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
@@ -75,6 +77,9 @@ async def main(cap):
 
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture(0)
+    if (config["INPUT"].isdigit()):
+        cap = cv2.VideoCapture(int(config["INPUT"]))
+    else:
+        cap = cv2.VideoCapture(config["INPUT"])
     asyncio.run(main(cap))
     cap.release()
