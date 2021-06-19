@@ -4,3 +4,4 @@ imutils
 pytesseract
 pandas
 python-dotenv
+yaspin

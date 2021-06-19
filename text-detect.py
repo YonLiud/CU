@@ -6,16 +6,14 @@ import pytesseract
 import pandas as pd
 import time
 import asyncio
+from yaspin import yaspin
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
 car_cascade = cv2.CascadeClassifier('cars.xml') 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-async def print_plate(plate):
-    print("plate: " + str(plate))
-
-async def detect_cars(image):
+async def detect_cars(image, sp):
     text = None
     Cropped = None
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #convert to grey scale
@@ -33,7 +31,7 @@ async def detect_cars(image):
          break
     if screenCnt is None:
       detected = 0
-      print ("No contour detected")
+      sp.write("X No contour detected")
     else:
       detected = 1
     if detected == 1:
@@ -51,29 +49,33 @@ async def detect_cars(image):
 
         text = ''.join([c for c in text if c in '0123456789'])
     except Exception as e:
-        print(e)
+        sp.write(e)
     if not text or text is None:
         text = "0 / Error Accrued"
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(image, 'Recent Plate: '+text, (10,450), font, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
-    print("Recent Plate: ",text)
+    sp.write("> plate: " + str(text))
     cv2.imshow("Frame", image)
     if Cropped is not None:
         cv2.imshow('Cropped',Cropped)
-async def main(cap):
-    while True:
-        ret, frame = cap.read()
-        cars = car_cascade.detectMultiScale(frame)
-        img = None
-        # for (x,y,w,h) in cars:
-        #         img = frame[y:y+h, x:x+w]
-        # if img is not None:
-        #     await detect_cars(img)
-        await detect_cars(frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+async def main(cap):
+    with yaspin(text="Working") as sp:
+        sp.color = "magenta"
+        while True:
+            ret, frame = cap.read()
+            cars = car_cascade.detectMultiScale(frame)
+            img = None
+            # for (x,y,w,h) in cars:
+            #         img = frame[y:y+h, x:x+w]
+            # if img is not None:
+            #     await detect_cars(img)
+            await detect_cars(frame, sp)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+            time.sleep(1)
 
 
 if __name__ == "__main__":
