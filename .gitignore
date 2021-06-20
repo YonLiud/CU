@@ -182,6 +182,6 @@ pip-selfcheck.json
 
 ### Data Files ###
 Example
-
+.env
 
 # End of https://www.toptal.com/developers/gitignore/api/python,opencv,visualstudiocode,virtualenv,venv

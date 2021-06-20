@@ -67,11 +67,13 @@ async def main(cap):
             ret, frame = cap.read()
             cars = car_cascade.detectMultiScale(frame)
             img = None
-            # for (x,y,w,h) in cars:
-            #         img = frame[y:y+h, x:x+w]
-            # if img is not None:
-            #     await detect_cars(img)
-            await detect_cars(frame, sp)
+
+            height, width= frame.shape[:2]
+
+            roi = frame[0:width, int(height/2):height]
+
+
+            await detect_cars(roi, sp)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
