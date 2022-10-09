@@ -36,5 +36,5 @@ pip3 install -r requirements.txt
 
 ## Contributing
 
-PRs accepted.
-
+PRs are always welcome and are appriciated!
+_Hacktoberfest Tag is present :)_
