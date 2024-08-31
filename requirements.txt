@@ -1,5 +1,5 @@
 numpy==1.23.3
-opencv-python==4.6.0.66
+opencv-python==4.8.1.78
 imutils==0.5.4
 pytesseract==0.3.10
 python-dotenv==0.21.0
